@@ -1,0 +1,360 @@
+==== Windows Azure Pack Installation
+Prior to installing the main SC WAP Server, we must first deploy a number of Pre-Requisites to the server, otherwise the installation will stop, force us to install these components, and insist we reboot, before the installation can proceed.
+
+IMPORTANT: Focus Server is **WAP-WS-01**
+
+===== Installation with the Web Platform Installer
+There are a number of options for installing the Windows Azure pack, however one of the simplest is to leverage the Web Platform Installer. This will always offer the latest version of the software and will take care of the Pre-Requisites for us, as well as completing the installation of the components as they are downloaded. Therefore leaving us free to focus and concentrate on the customisation and use of the portal, and its services.
+
+To use the Web Platform Installer, or WebPI as it is commonly known, simply launch your browser and open the link http://www.microsoft.com/web/downloads/platform.aspx. On the presented page, simply click on the download link to get us started.
+
+.Web Platform Installer – Web Site
+image::images/wap-webplat5-0001.PNG[WCF Installation]
+
+* We will normally be prompted by the Browser to download and Run the application which we just selected
++
+.Web Platform Installer – Download and Run
+image::images/wap-webplat5-0002.PNG[WCF Installation]
+
+* After a few moments, the download will complete, and the Web Platform installer should be presenting us with its Splash Screen
++
+.Web Platform Installer – Splash Loader
+image::images/wap-webplat5-0004.PNG[WCF Installation]
+
+We will use this tool to download all the Windows Azure Pack components which we wish to implement. Windows Azure Pack is a modular product, and allows to be isntalled on a single host which is great for Proof Of Concepts and small deployments, or distributed across a number of different systems to address concers related to scalability, and of course security. The combination of components installed is totally up to you, however for the purpose of this guide we will follow two configuration scenarios again.
+
+. Proof Of Concept all in one deployment
+. Production segregated deployment, with Administrative and Tenant services deployed to dedicated hosts.
+
+The following table lists all the components, and identifies which components will be installed based on the installation path we are going to implement
+
+[format="csv", options="header", separator="|"]
+|===
+Component Name                                | POC Install | Production Install
+Windows Azure Pack: Admin API                 |  Yes  | Admin Node
+Windows Azure Pack: Admin Site                |  Yes  | Admin Node
+Windows Azure Pack: Tenant API                |  Yes  | Admin Node
+Windows Azure Pack: Admin Authentication Site |  Yes  | Admin Node
+Windows Azure Pack: PowerShell API            |  Yes  | Admin & Tenant Node
+Windows Azure Pack: Best Practices Analyzer   |  Yes  | Admin & Tenant Node
+Gridpro Request Management for Windows Azure Pack Admin Site Extension |  Yes  | Admin Node
+Cloud Cruiser for Windows Azure Pack Admin Site Extension |  Yes  | Admin Node
+Windows Azure Pack: MySQL Extension           |  Yes  | Admin Node
+Windows Azure Pack: SQL Server Extension      |  Yes  | Admin Node
+Windows Azure Pack: Tenant Site               |  Yes  | Tenant Node
+Windows Azure Pack: Tenant Public API       |  Yes  | Tenant Node
+Windows Azure Pack: Tenant Authentication Site|  Yes  | Tenant Node
+Gridpro Request Management for Windows Azure Pack Tenant Site Extension|  Yes  | Tenant Node
+Cloud Cruiser for Windows Azure Pack Tenant Site Extension|  Yes  | Tenant Node
+|===
+
+* Based on the chosen installation path, select the components you are going to install for the active node. Remember that if you are deploying the production systems distributed, you will need to run this procedure on each node participating in the configuration.
++
+.Web Platform Installer – Windows Azure Pack Components Selection
+image::images/wap-webplat5-0005.PNG[WCF Installation]
+
+* After you have selected all the relevant components, these will be placed in a "Cart" for you to validate before progressing
++
+.Web Platform Installer – Windows Azure Pack Download Cart
+image::images/wap-webplat5-0006.PNG[WCF Installation]
+
+* After the Cart has being verified, the Platform installer will determine what addtion components must be installed to support the selectioned we have completed. These will then be automatically added to the cart for download and installation on your behalf.
++
+.Web Platform Installer – Windows Azure Pack Prerequisite Components
+image::images/wap-webplat5-0007.PNG[WCF Installation]
+
+* Next, we have the option to allow the Platform installer activiate the Windows Update features to ensure we are going to keep the environment up-to-date and secure.
++
+.Web Platform Installer – Windows Update Options
+image::images/wap-webplat5-0008.PNG[WCF Installation]
+
+* Finally, we should see the Installer begin to download all the components, and then proceed to install these on the host for us
++
+.Web Platform Installer – Components Download
+image::images/wap-webplat5-0009.PNG[WCF Installation]
+
+* Instructions are then presented to inform us of post configuration tasks which we should conduct before the system is ready for use
++
+.Web Platform Installer – Initial Component Configuration
+image::images/wap-webplat5-0010.PNG[WCF Installation]
+
+* Finally, the Web Platform Installer will confirm that this part of the process is now complete.
++
+.Web Platform Installer – Download and Installation Confirmation
+image::images/wap-webplat5-0011.PNG[WCF Installation]
+
+===== Installation with PDT
+
+==== Windows Azure Pack Farm Configuration
+
+With the Azure Pack components installed, we must next execute some configuration steps. In the case of Windows Azure Pack, the Configuration process will create, or update a central database which the service will use to determine where different components live in the environment, and if there are multiple copies of some of the components deployed, for example it would be very common in a full production solution to have multiple nodes configured with the Tenant Portal, and host these behind a load ballancer.
+
+===== Component Configuration Site
+
+We begin by opening our browser and pointing to the configuration site. Every host to which we deploy Windows Azure Pack components to, will have an instance of the configuration site deployed to it. The site is listening by default on the TCP 30101.
+
+NOTE: Remember that you will need to run this configuration procedure on each host, otherwise the host will not publish its installed components to the Windows Azure Pack farm.
+
+* Launch the Browser and navigate to the hosts Windows Azure Pack Configuration site located at the URI https://<servername>:30101/. As the web page loads, we are going to get a certificate warning, this is to be expected as the site is initial protected with an un-trusted self-signed certificate (we will replace these a little later).
++
+.Windows Azure Pack – Configuration Site Self Signed Certificate Warning
+image::images/wap-admin-0001.PNG[WCF Installation]
+
+* After accepting the certificate warning, we will be presented with a WAP Configuration splash screen; after a few moments we will be redirected to the main configuration page.
++
+.Windows Azure Pack – Configuration Site Welcome
+image::images/wap-admin-0002.PNG[WCF Installation]
+
+* The First time we run the configuration site in our environment the database server we reference will be configured with the new tables required for the system to function. The data hosted in this database will then be protected with the secret key we will also be defining at this point.
+* On all subsequent servers which we will add to this farm we will point to the same database, and provide the same secret; this is to ensure that unauthorised users do not attempt to extend the farm without propper consent.
++
+.Windows Azure Pack – Configuration Site defining Configuration Database Host
+image::images/wap-admin-0003.PNG[WCF Installation]
+
+** In the *Connect to the SQL Server* section of the page provide the name and instance of the SQL Database we are going to connect with.
++
+[format="csv", options="header", separator="|"]
+|===
+Setting                      | POC Install                   | Production Install
+SQL Server Name & Instance   | PDC-DB-SQL1.DigiNerve.net\WAP | WAP-DB-SQL1.WindowsAzurePack.local\WAP
+Authentication Type          | SQL Authentication            | SQL Authentication
+Account                      | SA                            | SA
+Password                     | P@ssw0rd!                     | P@ssw0rd!
+|===
+
+** For the *Configuration Store*, we will set a suitable passphrase to mangle the data hosted in the database. Keep this very safe as you will need this if you plan to change the farm at any point, and there is no way to recover it! As an example we could use a Pass Phrase like *W1nd0wsAzur3Pack2013!*
+
+* When all settings are Ok, we can move on to the next page of the configuration site, and choose if we wish to provide feedback to Microsoft automatically related to usage and issues
++
+.Windows Azure Pack – Configuration Site Feedback Options
+image::images/wap-admin-0004.PNG[WCF Installation]
+
+* The configuration site will then present a summary of the components which are going to be configured on this host, once ready we can proceed to apply the settings
++
+.Windows Azure Pack – Configuration Site Customisation Confirmation
+image::images/wap-admin-0005.PNG[WCF Installation]
+
+* After a few moments, the different components should be confirmed as configured. Once all the components are configured we should see a list of green checks indicating this has worked without issue.
++
+.Windows Azure Pack – Configuration Site Confirming all modules updated correctly
+image::images/wap-admin-0006.PNG[WCF Installation]
+
+* Finally, as we click the configuration site to complete, it will request that it is allowed to close the web page for us.
++
+.Windows Azure Pack – Configuration Site Procedures Complete
+image::images/wap-admin-0007.PNG[WCF Installation]
+
+NOTE: Remember, we need to repeat this process for each host which you have deployed Windows Azure Pack components to.
+
+===== User Friendly Resource Addressing
+
+One of the first set of problems we will discover immedieatly after the installation and configuration of the Windows Azure Pack, is that the URL's which we are initially using, are all based on quite odd TCP Port numbers, and not at all friendly to use. In addition all the services and sites are protect using SSL which is great, but sadly the default certificates used for this task as all self signed certificates which are not trusted by anything else. In this section we will set about resolving these issues by introducting name friendly DNS aliases for each of the main services, and also change the TCP listeners on these sites to use the standard HTTPS port of TCP 443.
+
+To get started the following is a summary of the current default URIs for both our Proof of Concept, and Production environments, along with the target URIs we will actauly publish for our users to connect over.
+
+[format="csv", options="header", separator="|"]
+|===
+Site	          | Original POC URI	           | Original Production URI      | New URI
+TenantSite	    | https://pdc-sc-sma01:30081/	 | https://pdc-sc-sma01:30081/	| https://manage.cloud.lionbridge.com:443/
+AuthSite	      | https://bil-sc-sma01:30071/  | https://pdc-sc-sma01:30071/	| https://manageauth.cloud.lionbridge:443/
+AdminSite	      | https://bil-sc-sma01:30091/  | https://pdc-sc-sma01:30091/	| https://admin.cloud.lionbridge.com:443/
+WindowsAuthSite |	https://bil-sc-sma01:30072/	 | https://pdc-sc-sma01:30072/	| https://adminAuth.cloud.lionbridge.com:443/
+|===
+
+To implement this change there are a number of different areas we are going to need to update. These will include
+
+* DNS Aliases
+* IIS Web Site Listeners
+* IIS Web Site SSL Bindings
+* Windows Azure Pack Configuration Settings
+
+====== DNS Entries
+After selecting the new URLs which we will use to publish the services, we need to have these added to the internal DNS server.
+
+IMPORTANT: Focus Server is PDC-AD-DC01
+
+In the case of publishing your cloud outside the firewall for external users to access you will also need to configure the firewall address translaion services and proceed to publish these aliases and public addresses on your external DNS Server.
+
+In both our Proof of Concept, and Production scenarios, we will still be choosing to have these records added to the production DNS Servers. I am also taking the liberity the add a *cloud* subdomain to the fully qualified DNS name, to help me present this as a different service from anything else which i maybe hosting.
+
+[format="csv", options="header", separator="|"]
+|===
+Site Name               |SiteFederationName | New DNS Name	                 | Target Address
+WAP Tenant Portal       |TenantSite	        | manage.cloud.diginerve.net	   | 10.5.2.187
+WAP Tenant ASP Auth Site|AuthSite	          | manageauth.cloud.diginerve.net | 10.5.2.187
+WAP Admin Portal        |AdminSite	        | admin.cloud.diginerve.net 	   | 10.5.2.187
+WAP Admin ASP Auth Site |WindowsAuthSite	  | adminAuth.cloud.diginerve.net  | 10.5.2.187
+|===
+
+
+.Azure Pack – Update DNS Aliases for Web Services
+image::images/wap-certs-0003.PNG[WCF Installation]
+
+We can use PowerShell to add these records to the DNS server also
+```powershell
+add-dns
+```
+
+====== Load Public Certificate
+
+Load the ** *.cloud.diginerve.net ** certificate to the computer store on each of the servers which we have also deployed Windows Azure Pack Components to.
+
+For more details on aquiring and working with certificates, please refer to *Appendix 1 - Certificate Management*
+
+.Azure Pack – Import new Wildcard Certificate
+image::images/wap-certs-0002.PNG[WCF Installation]
+
+
+
+====== IIS Address and SSL Bindings
+Add the new wildcard certificate to the Local Computer Store of the Server, and ensure it is offered to IIS to web publishing
+
+IIS Site Bindings
+
+[format="csv", options="header", separator="|"]
+|===
+Site Label|WAP Tenant Portal          | WAP Tenant ASP Auth Site       | WAP Admin Portal          | WAP Admin ASP Auth Site
+SiteName | TenantSite                 | AuthSite                       | AdminSite                 | WindowsAuthSite
+Old Port | 30081                      | 30071                          | 30091                     | 30072
+New Port | 443 	                      | 443                            | 443                       | 443
+Host Name| manage.cloud.diginerve.net | manageauth.cloud.diginerve.net | admin.cloud.diginerve.net | adminAuth.cloud.diginerve.net
+SNI 	   | YES 	                      | YES                            | YES                       | Yes
+SSL Cert | Cloud Wildcard             | Cloud Wildcard                 | Cloud Wildcard            | Cloud Wildcard
+|===
+
+
+Admin Site::
++
+.Azure Pack – Admin Site Default Settings in IIS
+image::images/wap-certs-0004.PNG[WCF Installation]
+
++
+.Azure Pack – Admin Site Customised Settings in IIS
+image::images/wap-certs-0005.PNG[WCF Installation]
+
+Admin Authentication Site::
++
+.Azure Pack – Admin Authentication Site Default Settings in IIS
+image::images/wap-certs-0006.PNG[WCF Installation]
+
++
+.Azure Pack – Admin Authentication Site Customised Settings in IIS
+image::images/wap-certs-0007.PNG[WCF Installation]
+
+Tenant Site::
++
+.Azure Pack – Tenant Site Default Settings in IIS
+image::images/wap-certs-0010.PNG[WCF Installation]
+
++
+.Azure Pack – Tenant Site Customised Settings in IIS
+image::images/wap-certs-0011.PNG[WCF Installation]
+
+Tenant Authentication Site::
++
+.Azure Pack – Tenant Authentication Site Default Settings in IIS
+image::images/wap-certs-0012.PNG[WCF Installation]
+
++
+.Azure Pack – Tenant Authentication Site Customised Settings in IIS
+image::images/wap-certs-0013.PNG[WCF Installation]
+
+
+
+====== Windows Firewall
+
+.Azure Pack – Update Windows Firewall
+image::images/wap-certs-0008.PNG[WCF Installation]
+
+====== Windows Azure Pack Configuration Database
+As we begin to work with Windows Azure pack, we will be required by many of the commandlets in the Administration PowerShell module to make a connection with the Azure Pack configuration database. The configuration options will depend on the deployment database we have already chosen in the configuration steps, and suggested in the table.
+
+Using a string similar to the following, we can store this reference for later use in a variable.
+
+```powershell
+$WAP_MgmtDB_Conn = 'Server=WAP-DB-SQL1.WindowsAzurePack.local\WAP;Initial Catalog=Microsoft.MgmtSvc.Store;User ID=sa;Password=!Reset123'
+
+$WAP_CfgDB_Conn  = 'Server=WAP-DB-SQL1.WindowsAzurePack.local\WAP;Initial Catalog=Microsoft.MgmtSvc.Config;User ID=sa;Password=!Reset123'
+```
+
+
+Tenant Public Site::
++
+```powershell
+Set-MgmtSvcFqdn -Namespace "TenantSite" -FullyQualifiedDomainName "manage.cloud.lionbridge.com" -Port 443 -ConnectionString $WAP_MgmtDB_Conn
+
+Set-MgmtSvcFqdn -Namespace "AuthSite" -FullyQualifiedDomainName "manageauth.cloud.lionbridge.com" -Port 443 -ConnectionString $WAP_MgmtDB_Conn
+```
+
+Tenant Public Site Authentication::
++
+```powershell
+Set-MgmtSvcRelyingPartySettings –Target Tenant –MetadataEndpoint "https://manageauth.cloud.lionbridge.com:443/FederationMetadata/2007-06/FederationMetadata.xml" -ConnectionString $WAP_MgmtDB_Conn
+
+Set-MgmtSvcIdentityProviderSettings –Target Membership –MetadataEndpoint "https://manage.cloud.lionbridge.com:443/FederationMetadata/2007-06/FederationMetadata.xml" -ConnectionString $WAP_MgmtDB_Conn
+```
+
+Admin Private Site::
++
+```powershell
+Set-MgmtSvcFqdn -Namespace "AdminSite" -FullyQualifiedDomainName "admin.cloud.lionbridge.com" -Port 443 -ConnectionString $WAP_MgmtDB_Conn
+
+Set-MgmtSvcFqdn -Namespace "WindowsAuthSite" -FullyQualifiedDomainName "adminauth.cloud.lionbridge.com" -Port 443 -ConnectionString $WAP_MgmtDB_Conn
+```
+
+Admin Private Site Authentication::
++
+```powershell
+Set-MgmtSvcRelyingPartySettings -Target Admin -MetadataEndpoint "https://adminauth.cloud.lionbridge.com:443/FederationMetadata/2007-06/FederationMetadata.xml" -ConnectionString $WAP_CfgDB_Conn
+
+Set-MgmtSvcIdentityProviderSettings -Target Windows -MetadataEndpoint "https://admin.cloud.lionbridge.com:443/FederationMetadata/2007-06/FederationMetadata.xml" -ConnectionString $WAP_CfgDB_Conn
+```
+
+====== Reload the Web Servers
+With the configuration now complete, reload the IIS Servers to ensure the sites apply the new settings
+
+```powershell
+iisreset
+```
+
+
+======  Add Domain Accounts to WAP Administrators Site
+During the initial installation and configuration of Windows Azure Pack (WAP) we will have set our installation user account as a member of the administrators list of Windows Azure Pack, enabling us to login to the Admin Portal.
+
+We will want to add additional User accounts to this role, which is accomplished via PowerShell. To add a domain user or group to the Windows Azure Pack Admins you can use the following commands. Of course it does make a lot of sense to create a security group in your domain, where you add all the WAP administrators, and add this group to the Azure Pack administrators.
+
+First, using the following command we can verify which accounts are currently in the Administrators list.
+
+```powershell
+Get-MgmtSvcAdminUser  -ConnectionString $WAP_MgmtDB_Conn
+```
+
+Next, we can add an user or group to the Azure Pack Admin list with the following command
+
+```powershell
+Add-MgmtSvcAdminUser -ConnectionString $WAP_MgmtDB_Conn -Principal 'WAP\!IT grp Azure Pack Admins'
+```
+
+===== Admin Configuration
+
+.Windows Azure Pack – Administration Portal Site Self Signed Certificate Warning
+image::images/wap-admin-0008.PNG[WCF Installation]
+
+
+.Windows Azure Pack – Administration Portal Authentication Challenge
+image::images/wap-admin-0009.PNG[WCF Installation]
+
+
+.Windows Azure Pack – Redirected back to Administration Portal with Site Self Signed Certificate Warning
+image::images/wap-admin-0010.PNG[WCF Installation]
+
+
+.Windows Azure Pack – Administration Portal Welcome Wizard
+image::images/wap-admin-0011.PNG[WCF Installation]
+
+
+
+Walk the Wizard
+
+.Windows Azure Pack – Administration Portal New Items Drawer Expanded
+image::images/wap-admin-0012.PNG[WCF Installation]

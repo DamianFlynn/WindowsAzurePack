@@ -1,0 +1,27 @@
+==== Export Certificate to PFX
+In order to use the certificate on other machines, we will export the certificate, including its private key, to store it in a .PFX file with a password on the file. This will enable us to import this certificate with its private keys on other servers which might require the certificate for its use.
+
+*	Launch *Internet Information Services (IIS) Manager*, and select the server name in the node list.
+*	Double Click on the *Server Certificates* icon in the main pane to open the *Server Certificates View*
+*	Right click on the chosen *Certificate* and from the context menu select the option *Properties*
+*	Now the *Certificate* dialog should be displayed. We will change focus to the *Details* tab, and select the option *Copy to File…*
++
+.Certificate - Details page
+image::images/ssl-exportpfx-0001.png[WCF Installation]
+
+*	Now, the *Certificate Export Wizard* should be presented to us, start the wizard by clicking *Next*
+**	On the *Export Private Key* page of the wizard, ensure that you select the option *Yes, export the private key*.
++
+.Certificate - Export Wizard Private Key Page
+image::images/ssl-exportpfx-0002.png[WCF Installation]
+
+**	On the *Export File Format* page, the option *Personal Information Exchange (.PFX)* will be the only one available to us, and therefore selected
++
+.Certificate - Export Wizard File Format Page
+image::images/ssl-exportpfx-0003.png[WCF Installation]
+
+***	Ensure that the options *Include all certificates in the certification path if possible* and *Export all extended properties* are both selected, the click *Next*
+**	On the *Security* page, select the option *Password*
+*** Provide and confirm a password to protect the exported certificate. This password will be used anytime we chose to import this certificate to a new system. Once complete proceed by clicking on *Next*
+**	On the *File to export* page, in the *File Name* field provide the UNC Path and file name to store our new .PFX file to, for example *\\pdc-fs-smb01\Store\Certificates\wildcard.diginerve.net\wildcard_diginerve_net.pfx*. Click *Next*
+**	Finally, review the *summary*, and click on *Finish* to create our new exported .PFX certificate

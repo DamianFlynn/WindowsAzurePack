@@ -1,0 +1,46 @@
+==== Importing a PFX Certificate to the Local Computer
+
+The procedure will cover the steps required to import the certificate bundle as contained in a PFX file, to the local certificate store on a node. The procedure would need to be executed on each node to which you wish to use the certificate on.
+
+On the computer to which we wish to import the new certificate, we will execute the following procedure
+
+*	Launch the Microsoft Management Console, using *MMC.EXE*
+*	Once launched, select the option from the *File* menu to *Add/Remove Snap-In…*
++
+.MMC Console - Snap In's
+image::images/ssl-importpfx-0001.PNG[WCF Installation]
+
+*	In the *Add/Remove Snap-In* select the option *Certificates*
+**	On the *Certificates snap-in* dialog, select the radio option for *Computer account* then click *Next*
++
+.MMC Console - Computer Certificates Snap-In
+image::images/ssl-importpfx-0002.PNG[WCF Installation]
+
+** Select the option **Local Computer** then click *Finish*
++
+.MMC Console - Local Computer Certificates Focus
+image::images/ssl-importpfx-0003.PNG[WCF Installation]
+
+** Click OK to close the Add/Remove Snap-In dialog
+* Now, back at the main MMC view, we can see the new *Certificates* node
+* Expand the *Personal* node.
+* On the context menu select *All Tasks -> Import…*
++
+.MMC Console - Import Certificate
+image::images/ssl-importpfx-0004.PNG[WCF Installation]
+
+* This will launch the Certificate *Import Wizard*
+** Click Next to open the *File to Import* Page.
+** In the *File Name* field, using the Browse button to navigate to the location of the PFX file then click *Next*
+** In the *Password* field, enter any password you may have set to protect the PFX file.
+** On the *Import Options* Page
+*** Select the options *Mark this key as exportable*, and the options *Include all extended properties*
+*** Then click Next
+** On the *Certificate Store* page, select the option *Automatically select the certificate store based on the type of certificate* and click *Next*
+** Review the details and then click on *Finish*
+* The wizard should now complete, and if we refresh the console view of our Local Computers personal store, we should see that our new Certificate has been imported
++
+.MMC Console - Imported Certificate View
+image::images/ssl-importpfx-0005.PNG[WCF Installation]
+
+That’s it, you now have your new certificate added to the Local Computer store of the system.
